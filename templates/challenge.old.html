@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>FOXYON Mini by SparkleYeen</title>
+        <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+        <meta http-equiv="refresh" content="50">
+        <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    </head>
+    <body>
+        <p id="challenge"><%= self.challenge_str() %>|<%= self.difficulty_bits %>|<%= self.integrity_b64_str() %>|<%= self.expires_at %></p>
+        <form method="post" action="/challenge">
+            <input type="text" id="solution" name="solution">
+            <input type="submit" value="Submit">
+            <p>
+                python3 -c "from blake3 import blake3;c,b,i,e='<%= self.challenge_str() %>|<%= self.difficulty_bits %>|<%= self.integrity_b64_str() %>|<%= self.expires_at %>'.split('|');b=int(b);n=0;exec('while 1:\\n h=int.from_bytes(blake3(f\"{n}{c}{e}\".encode()).digest(),byteorder=\"little\")\\n if not h&(2**b-1):print(f\"{n}|{c}|{b}|{e}|{i}\");break\\n n+=1')"
+            </p>
+        </form>
+    <script>
+        const [challenge, difficultyBits, integrity_b64, expiresAt] = document.getElementById('challenge').textContent.split("|");
+        const worker = new Worker("/zstatic/worker.js", {type:"module"});
+
+        worker.addEventListener("message", function (e) {
+            document.getElementById('solution').value = `${e.data.nonce}|${challenge}|${difficultyBits}|${expiresAt}|${integrity_b64}`;
+        })
+        worker.addEventListener("error", function (e) {
+            console.error(e);
+        })
+        worker.postMessage({challenge, difficultyBits, expiresAt});
+    </script>
+    </body>
+</html>

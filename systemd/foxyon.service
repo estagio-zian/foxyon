@@ -1,0 +1,56 @@
+[Unit]
+Description=Foxyon Anti-DoS Protection
+After=network.target
+
+[Service]
+Type=simple
+User=foxyon
+Group=foxyon
+ExecStart=/usr/local/bin/foxyon
+Restart=always
+RestartSec=3
+
+NoNewPrivileges=true
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+RestrictSUIDSGID=yes
+ProtectHostname=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+LockPersonality=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+ProtectClock=yes
+PrivateUsers=yes
+MemoryDenyWriteExecute=yes
+RestrictRealtime=yes
+RemoveIPC=yes
+ProtectKernelLogs=yes
+
+ProtectSystem=strict
+SystemCallArchitectures=native
+ProtectProc=invisible
+
+DeviceAllow=/dev/null rw
+DeviceAllow=/dev/zero rw
+DeviceAllow=/dev/urandom r
+DeviceAllow=/dev/random r
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=foxyon
+
+LimitNOFILE=1048576
+LimitNPROC=8192
+TasksMax=8192
+
+RestrictAddressFamilies=AF_INET AF_INET6
+CapabilityBoundingSet=
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged ~@obsolete ~@mount ~@module ~@debug ~@raw-io ~@cpu-emulation ~@clock
+SystemCallFilter=~@setuid ~@keyring
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

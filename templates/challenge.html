@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FOXYON Mini by SparkleYeen</title>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta http-equiv="refresh" content="50">
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <style>
+        body { font-family: monospace; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+        .container { background: white; padding: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input[type="text"] { width: 100%; padding: 8px; margin: 10px 0; font-family: monospace; }
+        input[type="submit"] { padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .challenge { background: #eee; padding: 10px; margin: 10px 0; font-size: 12px; word-break: break-all; }
+        .python { background: #2d2d2d; color: #f8f8f2; padding: 10px; margin: 10px 0; font-size: 11px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>FOXYON Mini by SparkleYeen</h2>
+
+    <noscript>
+        <div class="challenge"><%= self.challenge_str() %>|<%= self.difficulty_bits %>|<%= self.integrity_b64_str() %>|<%= self.expires_at %></div>
+        <div class="python">
+            python3 -c "from blake3 import blake3;c,b,i,e='<%= self.challenge_str() %>|<%= self.difficulty_bits %>|<%= self.integrity_b64_str() %>|<%= self.expires_at %>'.split('|');b=int(b);n=0;exec('while 1:\\n h=int.from_bytes(blake3(f\"{n}{c}{e}\".encode()).digest(),byteorder=\"little\")\\n if not h&(2**b-1):print(f\"{n}|{c}|{b}|{e}|{i}\");break\\n n+=1')"
+        </div>
+    </noscript>
+
+    <div id="challenge" style="display:none;"><%= self.challenge_str() %>|<%= self.difficulty_bits %>|<%= self.integrity_b64_str() %>|<%= self.expires_at %></div>
+
+    <form method="post" action="/challenge">
+        <input type="text" id="solution" name="solution" placeholder="Paste the solution here, or just wait if JavaScript is enabled!">
+        <input id="snd" type="submit" value="Submit">
+    </form>
+</div>
+
+<script>
+    const [challenge, difficultyBits, integrity_b64, expiresAt] = document.getElementById('challenge').textContent.split("|");
+    const worker = new Worker("/zstatic/worker.js", {type:"module"});
+
+    worker.addEventListener("message", function (e) {
+        document.getElementById('solution').value = `${e.data.nonce}|${challenge}|${difficultyBits}|${expiresAt}|${integrity_b64}`;
+        document.querySelector('form').requestSubmit();
+    })
+    worker.addEventListener("error", function (e) {
+        console.error(e);
+    })
+    worker.postMessage({challenge, difficultyBits, expiresAt});
+</script>
+</body>
+</html>

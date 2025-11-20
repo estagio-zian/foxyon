@@ -1,0 +1,42 @@
+[server]
+host = "0.0.0.0"
+port = 2616
+workers = 1
+backlog = 2048
+max_connections = 25000
+keep_alive = 5
+
+[pow]
+challenge_ttl = 20
+
+[pow.difficulty]
+minimum = 17
+medium = 20
+high = 22
+ultra = 24
+
+[pow.cpu_thresholds]
+low = 30.0
+medium = 60.0
+high = 70.0
+critical = 90.0
+
+[routes]
+auth = "/auth"
+challenge = "/challenge"
+
+[logging]
+level = "ERROR"
+
+[session]
+redis_url = "redis://192.168.113.132:6379"
+initial_capacity = 1000
+max_capacity = 100000
+ttl = 300
+tti = 120
+
+[security]
+keyed_hash = ""
+
+[system]
+cpu_usage_update_interval = 5

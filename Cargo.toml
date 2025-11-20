@@ -1,0 +1,111 @@
+[package]
+name = "foxyon"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = ["mimalloc", "local", "debug"]
+snmalloc = ["dep:snmalloc-rs"]
+mimalloc = ["dep:mimalloc"]
+local = []
+redis = ["dep:deadpool-redis"]
+debug = []
+system-alloc = []
+
+[dependencies]
+actix-web = "4"
+toml = "0.9"
+serde = { version = "1", features = ["derive"] }
+sailfish = "0.10"
+rand = "0.9"
+primitive-types = "0.14.0"
+blake3 = "1.8"
+sysinfo = "0.37"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+fastbloom = "0.14"
+moka = {version = "0.12.10", features = ["future"]}
+subtle = "2.6"
+snmalloc-rs = {version = "0.3", optional = true}
+mimalloc = {version = "0.1", optional = true}
+base64-simd = "0.8.0"
+tokio = {version = "1", features = ["full"]}
+twox-hash = "2.1"
+deadpool-redis = {version = "0.22", optional = true}
+ahash = "0.8"
+itoa = "1.0"
+atoi_simd = "0.17.0"
+memchr = "2.7.6"
+ada-url = "3.3.0"
+
+[dev-dependencies]
+criterion = "0.7.0"
+
+[[bench]]
+name = "blake3"
+harness = false
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = "fat"
+panic = "abort"
+strip = true
+
+[profile.dev]
+incremental = true
+codegen-units = 256
+opt-level = 0
+debug-assertions = true
+overflow-checks = true
+lto = false
+panic = "unwind"
+rpath = false
+
+[profile.dev.package."*"]
+opt-level = 3
+debug = false
+
+[profile.dev.package."serde"]
+opt-level = 3
+
+[profile.dev.package."base64-simd"]
+opt-level = 3
+
+[profile.dev.package."blake3"]
+opt-level = 3
+
+[profile.dev.package."mimalloc"]
+opt-level = 3
+
+[profile.dev.package."snmalloc-rs"]
+opt-level = 3
+
+[lints.clippy]
+correctness = { level = "deny", priority = -1 }
+invalid_atomic_ordering = "deny"
+arithmetic_side_effects = "deny"
+checked_conversions = "deny"
+cast_possible_truncation = "deny"
+cast_possible_wrap = "deny"
+cast_precision_loss = "deny"
+cast_ptr_alignment = "deny"
+await_holding_lock = "deny"
+await_holding_refcell_ref = "deny"
+undocumented_unsafe_blocks = "deny"
+mutex_integer = "deny"
+rc_mutex = "deny"
+rc_buffer = "deny"
+path_buf_push_overwrite = "deny"
+panic_in_result_fn = "deny"
+unwrap_used = "deny"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+option_env_unwrap = "deny"
+unnecessary_safety_comment = "deny"
+error_impl_error = "deny"
+float_cmp = "warn"
+large_stack_arrays = "warn"
+filetype_is_file = "warn"
+get_unwrap = "warn"
